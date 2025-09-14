@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.GridLayout;
+import android.widget.TextView;
 
 import java.util.Random;
 
@@ -14,6 +15,32 @@ public class MainActivity extends AppCompatActivity {
     public static final int GRID_SIZE = 3;
     private GridLayout grid;
     private boolean cellState[][];
+
+    private TextView scoreCounter;
+    private Button resetButton;
+    private Button randomizeButton;
+
+
+
+    View.OnClickListener resetListener = new View.OnClickListener() {
+        public void onClick(View v) {
+            if (v.getId() == R.id.resetButton){
+                setResetButton();
+                recolor();
+            }
+        }
+    };
+
+    View.OnClickListener randomizeListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            if (view.getId() == R.id.randomizeButton){
+                randomize();
+                recolor();
+
+            }
+        }
+    };
 
     View.OnClickListener buttonListener = new View.OnClickListener() {
         @Override
@@ -38,24 +65,53 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-        @Override
-        protected void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
-            cellState = new boolean[][]{{true, true, true}, {true, true, true}, {true, true, true}};
+        cellState = new boolean[][]{{true, true, true}, {true, true, true}, {true, true, true}};
 
-            setContentView(R.layout.activity_main);
-            grid = findViewById(R.id.light_grid);
+        setContentView(R.layout.activity_main);
+        grid = findViewById(R.id.light_grid);
+        scoreCounter = findViewById(R.id.counterHeader);
+        resetButton = findViewById(R.id.resetButton);
+        randomizeButton = findViewById(R.id.randomizeButton);
 
-            randomize();
 
-            recolor();
+        randomize();
+        counterMethod();
 
-            for (int i = 0; i < grid.getChildCount(); i++) {
-                Button currButton = (Button) grid.getChildAt(i);
-                currButton.setOnClickListener(buttonListener);
+        recolor();
+
+        resetButton.setOnClickListener(resetListener);
+        randomizeButton.setOnClickListener(randomizeListener);
+
+        for (int i = 0; i < grid.getChildCount(); i++) {
+            Button currButton = (Button) grid.getChildAt(i);
+            currButton.setOnClickListener(buttonListener);
+        }
+    }
+
+    private int counterMethod() {
+        int counter = 0;
+        for (int i = 0; i < GRID_SIZE; i++) {
+            for (int j = 0; j < GRID_SIZE; j++) {
+                if (cellState[i][j]) {
+                    counter++;
+                }
             }
         }
+        return counter;
+    }
+
+    public void setResetButton() {
+        for (int i = 0; i < GRID_SIZE; i++) {
+            for (int j = 0; j < GRID_SIZE; j++) {
+                cellState[i][j] = false;
+            }
+        }
+    }
+
 
         public void recolor() {
             for (int i = 0; i < grid.getChildCount(); i++) {
@@ -70,6 +126,9 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     gridButton.setBackgroundColor(getColor(R.color.black));
                 }
+
+                int counter = counterMethod();
+                scoreCounter.setText("Score " + counter);
             }
         }
 
